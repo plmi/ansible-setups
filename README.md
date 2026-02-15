@@ -145,7 +145,7 @@ nmcli connection down id "<profile-name>"
 - Layout:
   - Left: `hyprland/workspaces`, `hyprland/window`
   - Center: `clock`
-  - Right: VPN, target, public IP, network, audio, CPU, RAM, temperature, battery, tray
+  - Right: VPN, target, public IP, network, audio, CPU, RAM, temperature, battery
 - Target module behavior:
   - Shows `Target <value>` when `~/.target` first line is set and not `unset`
   - Shows `No Target` when missing/empty/`unset`
@@ -153,7 +153,7 @@ nmcli connection down id "<profile-name>"
 - VPN module behavior:
   - Detects active `tun/tap/wg/ppp` interfaces
   - Shows connected/disconnected state with color cues
-  - Click disconnects active VPN, or opens a `wofi` picker to connect a saved `nmcli` VPN/WireGuard profile
+  - Click opens `nm-applet`
 - Public IP module behavior:
   - Polls egress IP every 5 minutes
   - Click shows a one-shot IP check in `foot`
@@ -172,6 +172,7 @@ nmcli connection down id "<profile-name>"
 - `SUPER+SHIFT+S`: region screenshot to `swappy` flow (`grim` + `slurp`)
 - `SUPER+SHIFT+W`: cycle wallpapers (every image in `~/.local/share/wallpapers`, sorted by filename -> repeat)
 - `SUPER+B`: toggle Waybar visibility (`pkill -USR1 waybar`)
+- `SUPER+SHIFT+B`: reload Waybar (`pkill -USR2 waybar`)
 - `SUPER+Q`: close active window
 - `SUPER+SHIFT+E`: exit Hyprland session
 - `SUPER+F`: toggle fullscreen
