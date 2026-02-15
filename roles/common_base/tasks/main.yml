@@ -72,3 +72,32 @@
     mode: "0644"
   when: sddm_autologin_enabled | default(false) | bool
   tags: [sddm]
+
+- name: Configure SDDM default user session behavior
+  ansible.builtin.template:
+    src: sddm-users.conf.j2
+    dest: /etc/sddm.conf.d/10-default-session.conf
+    owner: root
+    group: root
+    mode: "0644"
+  when: sddm_autologin_enabled | default(false) | bool
+  tags: [sddm]
+
+- name: Find backup files in SDDM config directory
+  ansible.builtin.find:
+    paths: /etc/sddm.conf.d
+    file_type: file
+    patterns:
+      - "*.bak*"
+      - "*~"
+  register: sddm_backup_conf_files
+  when: sddm_autologin_enabled | default(false) | bool
+  tags: [sddm]
+
+- name: Remove backup files from SDDM config directory
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ sddm_backup_conf_files.files }}"
+  when: sddm_autologin_enabled | default(false) | bool
+  tags: [sddm]

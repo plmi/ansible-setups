@@ -140,6 +140,14 @@
       sudo sed -i 's/^Session=.*/Session=hyprland.desktop/' "$conf"
       sudo systemctl restart sddm
 
+- name: Install hyprprop helper
+  ansible.builtin.copy:
+    src: hyprprop.sh
+    dest: /usr/local/bin/hyprprop.sh
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Install minimal .zshrc
   ansible.builtin.copy:
     dest: "/home/{{ primary_user }}/.zshrc"

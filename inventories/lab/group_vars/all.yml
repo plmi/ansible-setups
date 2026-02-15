@@ -29,6 +29,8 @@ base_packages:
   - neovim
   - zsh
   - foot
+  - mpv
+  - zathura
   - python3-pip
   - pipx
   - podman

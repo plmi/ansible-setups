@@ -5,6 +5,7 @@ exec-once = waybar
 exec-once = swaync
 exec-once = nm-applet --indicator
 exec-once = {{ hyprland_polkit_agent_command }}
+exec-once = [workspace special:magic silent] {{ hyprland_scratchpad_terminal | default("foot --app-id scratchpad-term") }}
 # UTM/SPICE dynamic resolution: keep exactly one user agent in Hyprland sessions.
 exec-once = /home/{{ primary_user }}/.local/bin/spice-vdagent-hyprland.sh
 
@@ -32,7 +33,7 @@ decoration {
 }
 
 animations {
-    enabled = true
+    enabled = false
 }
 
 misc {
@@ -42,8 +43,13 @@ misc {
 $mainMod = SUPER
 
 bind = $mainMod, RETURN, exec, {{ hyprland_terminal }}
+bind = $mainMod, P, exec, {{ hyprland_launcher }}
 bind = $mainMod, D, exec, {{ hyprland_launcher }}
+bind = $mainMod, TAB, workspace, previous
+bind = $mainMod, SPACE, togglespecialworkspace, magic
+bind = $mainMod SHIFT, SPACE, movetoworkspace, special:magic
 bind = $mainMod SHIFT, S, exec, {{ hyprland_screenshot_cmd }}
+bind = $mainMod, B, exec, pkill -USR1 waybar
 bind = $mainMod, Q, killactive,
 bind = $mainMod SHIFT, E, exit,
 bind = $mainMod, F, fullscreen,
@@ -78,3 +84,12 @@ bind = $mainMod, j, movefocus, d
 
 bindm = $mainMod, mouse:272, movewindow
 bindm = $mainMod, mouse:273, resizewindow
+
+windowrulev2 = float, class:^(scratchpad-term)$
+windowrulev2 = size 70% 70%, class:^(scratchpad-term)$
+windowrulev2 = center, class:^(scratchpad-term)$
+windowrulev2 = float, class:^({{ hyprland_mpv_class_regex | default("mpv") }})$
+windowrulev2 = workspace {{ hyprland_workspace_brave | default("2") }} silent, class:^({{ hyprland_brave_class_regex | default("brave-browser|Brave-browser") }})$
+windowrulev2 = workspace {{ hyprland_workspace_firefox | default("2") }} silent, class:^({{ hyprland_firefox_class_regex | default("org\\.mozilla\\.firefox|firefox") }})$
+windowrulev2 = workspace {{ hyprland_workspace_burp | default("3") }} silent, class:^({{ hyprland_burp_class_regex | default("burp-StartBurp|burpsuite|BurpSuite") }})$
+windowrulev2 = workspace {{ hyprland_workspace_burp | default("3") }} silent, title:^({{ hyprland_burp_title_regex | default("Burp Suite") }})$
