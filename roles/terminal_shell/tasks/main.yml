@@ -10,6 +10,7 @@
       - neovim
       - fzf
       - bat
+      - btop
       - fastfetch
       - zoxide
     state: present
@@ -148,6 +149,23 @@
     group: root
     mode: "0755"
 
+- name: Install target helper
+  ansible.builtin.copy:
+    src: target.sh
+    dest: /usr/local/bin/target
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Ensure target file exists
+  ansible.builtin.copy:
+    dest: "/home/{{ primary_user }}/.target"
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0644"
+    force: false
+    content: "unset\n"
+
 - name: Install minimal .zshrc
   ansible.builtin.copy:
     dest: "/home/{{ primary_user }}/.zshrc"
@@ -162,6 +180,29 @@
       alias ll='eza -al --group-directories-first'
       alias gs='git status -sb'
       alias v='nvim'
+
+      # Load the current target into IP for each new shell.
+      if [ -f "$HOME/.target" ]; then
+        IP="$(head -n1 "$HOME/.target" | tr -d '\r')"
+        if [ -n "$IP" ]; then
+          export IP
+        else
+          unset IP
+        fi
+      fi
+
+      # Wrapper keeps ~/.target and $IP in sync in the current shell.
+      target() {
+        if command target "$@"; then
+          local new_ip
+          new_ip="$(head -n1 "$HOME/.target" 2>/dev/null | tr -d '\r')"
+          if [ -n "$new_ip" ]; then
+            export IP="$new_ip"
+          else
+            unset IP
+          fi
+        fi
+      }
 
       if [ -f /usr/share/fzf/shell/completion.zsh ]; then
         source /usr/share/fzf/shell/completion.zsh

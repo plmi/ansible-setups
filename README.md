@@ -8,6 +8,7 @@ No click-ops. No mystery state. Just `make apply`.
 - `foot` + `zsh` + `tmux` + `neovim`
 - OSCP-oriented tooling with Kali-like paths where it matters
 - Screenshot + annotation flow for report evidence (`grim` + `slurp` + `swappy`)
+- OSCP-focused Waybar with VPN/target/public-IP visibility
 
 ## Fast Start
 ```bash
@@ -87,6 +88,9 @@ make apply EXTRA_ARGS='--ask-pass --ask-become-pass'
 - `wpscan`: `gem install wpscan --no-document`
 - `metasploit`: `snap install metasploit-framework`
 
+### Flatpak
+- Obsidian: `md.obsidian.Obsidian` (via Flathub)
+
 ### Burp + Wordlists
 - Burp Community jar -> `/opt/burp/burpsuite_community.jar` + wrapper `/usr/local/bin/burp`
 - Kali-like wordlist paths:
@@ -107,3 +111,29 @@ ansible-playbook -i inventories/lab/hosts.yml playbooks/validate.yml
 - Store secrets with Ansible Vault.
 - Disable Hyprland COPR if needed via `hyprland_enable_copr: false` in `inventories/lab/group_vars/hyprland.yml`.
 - `ansible.cfg` uses `ssh_connection.usetty=False` to avoid OSC 3008 escape-sequence noise in module JSON output.
+
+## Waybar Behavior
+- Config files:
+  - `~/.config/waybar/config.jsonc`
+  - `~/.config/waybar/style.css`
+- Custom module scripts:
+  - `~/.config/waybar/scripts/vpn-status.sh`
+  - `~/.config/waybar/scripts/target-status.sh`
+  - `~/.config/waybar/scripts/public-ip.sh`
+- Layout:
+  - Left: `hyprland/workspaces`, `hyprland/window`
+  - Center: `clock`
+  - Right: VPN, target, public IP, network, audio, CPU, RAM, temperature, battery, tray
+- Target module behavior:
+  - Shows `Target <value>` when `~/.target` first line is set and not `unset`
+  - Shows `No Target` when missing/empty/`unset`
+  - Click opens `~/.target` in `nvim` (`foot`)
+- VPN module behavior:
+  - Detects active `tun/tap/wg/ppp` interfaces
+  - Shows connected/disconnected state with color cues
+  - Click opens `nmtui`
+- Public IP module behavior:
+  - Polls egress IP every 5 minutes
+  - Click shows a one-shot IP check in `foot`
+- Clock behavior:
+  - No click action configured

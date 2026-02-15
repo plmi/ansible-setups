@@ -53,6 +53,23 @@
     update_cache: true
   tags: [brave]
 
+- name: Ensure Flathub remote is configured
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+  when: obsidian_enable | default(true) | bool
+  tags: [obsidian]
+
+- name: Install Obsidian via Flatpak
+  community.general.flatpak:
+    name: "{{ obsidian_flatpak_app_id | default('md.obsidian.Obsidian') }}"
+    state: present
+    remote: flathub
+    method: system
+  when: obsidian_enable | default(true) | bool
+  tags: [obsidian]
+
 - name: Ensure SDDM config directory exists
   ansible.builtin.file:
     path: /etc/sddm.conf.d

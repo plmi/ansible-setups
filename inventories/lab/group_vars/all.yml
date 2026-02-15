@@ -42,3 +42,7 @@ base_packages:
   - tar
   - gcc
   - make
+  - flatpak
+
+obsidian_enable: true
+obsidian_flatpak_app_id: md.obsidian.Obsidian

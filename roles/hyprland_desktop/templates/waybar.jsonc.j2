@@ -1,22 +1,116 @@
 {
   "layer": "top",
   "position": "top",
-  "height": 38,
-  "modules-left": ["hyprland/workspaces"],
+  "height": 34,
+  "spacing": 4,
+  "modules-left": ["hyprland/workspaces", "hyprland/window"],
   "modules-center": ["clock"],
-  "modules-right": ["network", "pulseaudio", "battery", "tray"],
+  "modules-right": ["custom/vpn", "custom/target", "custom/public_ip", "network", "pulseaudio", "cpu", "memory", "temperature", "battery", "tray"],
+
+  "hyprland/workspaces": {
+    "disable-scroll": true,
+    "all-outputs": true,
+    "format": "{icon}",
+    "format-icons": {
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "10": "10",
+      "active": "*",
+      "default": "-"
+    }
+  },
+
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 70,
+    "separate-outputs": true
+  },
+
   "clock": {
-    "format": "{:%Y-%m-%d %H:%M}"
+    "format": "{:%d.%m.%Y %H:%M}",
+    "format-alt": "{:%d.%m.%Y %H:%M:%S}",
+    "tooltip-format": "{:KW %V}"
   },
+
+  "custom/vpn": {
+    "exec": "/home/{{ primary_user }}/.config/waybar/scripts/vpn-status.sh",
+    "return-type": "json",
+    "interval": 5,
+    "tooltip": true,
+    "on-click": "foot -e nmtui"
+  },
+
+  "custom/target": {
+    "exec": "/home/{{ primary_user }}/.config/waybar/scripts/target-status.sh",
+    "return-type": "json",
+    "interval": 3,
+    "tooltip": true,
+    "on-click": "foot -e nvim /home/{{ primary_user }}/.target"
+  },
+
+  "custom/public_ip": {
+    "exec": "/home/{{ primary_user }}/.config/waybar/scripts/public-ip.sh",
+    "return-type": "json",
+    "interval": 300,
+    "tooltip": true
+  },
+
   "network": {
-    "format-wifi": "WiFi {signalStrength}%",
-    "format-ethernet": "ETH",
-    "format-disconnected": "offline"
+    "format-wifi": "WIFI {essid} {signalStrength}%",
+    "format-ethernet": "ETH {ipaddr}",
+    "format-linked": "LINK",
+    "format-disconnected": "NET down",
+    "tooltip-format": "{ifname} via {gwaddr}",
+    "on-click": "foot -e nmtui"
   },
+
   "pulseaudio": {
-    "format": "vol {volume}%"
+    "format": "VOL {volume}% {icon}",
+    "format-muted": "MUTED",
+    "format-icons": {
+      "default": ["lo", "mid", "hi"]
+    },
+    "on-click": "pavucontrol",
+    "on-scroll-up": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%+",
+    "on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 2%-"
   },
+
+  "cpu": {
+    "format": "CPU {usage}%",
+    "interval": 2,
+    "on-click": "foot -e btop"
+  },
+
+  "memory": {
+    "format": "RAM {}%",
+    "interval": 2
+  },
+
+  "temperature": {
+    "critical-threshold": 85,
+    "format": "TMP {temperatureC}C",
+    "format-critical": "HOT {temperatureC}C"
+  },
+
   "battery": {
-    "format": "bat {capacity}%"
+    "format": "BAT {capacity}%",
+    "format-charging": "CHR {capacity}%",
+    "format-plugged": "AC {capacity}%",
+    "format-warning": "LOW {capacity}%",
+    "states": {
+      "warning": 25,
+      "critical": 12
+    }
+  },
+
+  "tray": {
+    "spacing": 8
   }
 }

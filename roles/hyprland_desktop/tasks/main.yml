@@ -32,6 +32,7 @@
   loop:
     - .config/hypr
     - .config/waybar
+    - .config/waybar/scripts
     - .config/wofi
     - .config/swappy
     - .config/autostart
@@ -60,6 +61,30 @@
     owner: "{{ primary_user }}"
     group: "{{ primary_user }}"
     mode: "0644"
+
+- name: Deploy waybar VPN status script
+  ansible.builtin.template:
+    src: waybar-vpn-status.sh.j2
+    dest: "/home/{{ primary_user }}/.config/waybar/scripts/vpn-status.sh"
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0755"
+
+- name: Deploy waybar target status script
+  ansible.builtin.template:
+    src: waybar-target-status.sh.j2
+    dest: "/home/{{ primary_user }}/.config/waybar/scripts/target-status.sh"
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0755"
+
+- name: Deploy waybar public IP script
+  ansible.builtin.template:
+    src: waybar-public-ip.sh.j2
+    dest: "/home/{{ primary_user }}/.config/waybar/scripts/public-ip.sh"
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0755"
 
 - name: Deploy wofi config
   ansible.builtin.template:
