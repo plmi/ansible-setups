@@ -1,0 +1,7 @@
+---
+- name: Ensure VPN NM packages are installed
+  ansible.builtin.apt:
+    name:
+      - network-manager-openvpn
+      - network-manager-openvpn-gnome
+    state: present

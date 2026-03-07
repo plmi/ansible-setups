@@ -1,0 +1,6 @@
+---
+- name: Assert Kali Linux distribution
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] == 'Kali'
+    fail_msg: "Debian family gate: expected Kali Linux."

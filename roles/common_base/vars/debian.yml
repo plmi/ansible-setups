@@ -1,0 +1,28 @@
+---
+_base_packages:
+  - git
+  - stow
+  - curl
+  - wget
+  - jq
+  - ripgrep
+  - fd-find
+  - fzf
+  - bat
+  - tmux
+  - neovim
+  - zsh
+  - foot
+  - mpv
+  - zathura
+  - python3-pip
+  - pipx
+  - flatpak
+  - ufw
+  - openvpn
+  - wireguard-tools
+  - unzip
+  - tar
+  - gcc
+  - make
+  - shellcheck

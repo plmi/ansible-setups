@@ -1,0 +1,5 @@
+---
+- name: Ensure shell and terminal packages are present
+  ansible.builtin.apt:
+    name: "{{ _terminal_packages }}"
+    state: present

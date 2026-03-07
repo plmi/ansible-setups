@@ -1,0 +1,5 @@
+---
+- name: Install Hyprland stack
+  ansible.builtin.apt:
+    name: "{{ _hyprland_packages }}"
+    state: present

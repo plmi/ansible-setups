@@ -1,0 +1,12 @@
+---
+- name: Ensure VPN config directories exist
+  ansible.builtin.file:
+    path: "/home/{{ primary_user }}/{{ item }}"
+    state: directory
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0700"
+  loop:
+    - .config/vpn
+    - .config/vpn/openvpn
+    - .config/vpn/wireguard

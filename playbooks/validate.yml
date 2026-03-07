@@ -1,6 +1,6 @@
 ---
 - name: Validate workstation and tooling
-  hosts: fedora_workstation
+  hosts: workstation:pentest
   become: true
   roles:
     - role: validate

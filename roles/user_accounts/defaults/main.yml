@@ -1,0 +1,4 @@
+---
+# Default to no extra groups; override in host_vars
+# Fedora: [wheel], Kali/Debian: [sudo]
+primary_user_groups: []

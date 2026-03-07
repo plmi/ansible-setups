@@ -5,20 +5,23 @@ ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_GALAXY ?= ansible-galaxy
 EXTRA_ARGS ?=
 
-.PHONY: help deps doctor apply workstation pentest validate
+.PHONY: help deps doctor apply workstation pentest validate fedora kali validate-kali
 
 help:
 	@echo "Targets:"
-	@echo "  make deps         Install Ansible collections from requirements.yml"
-	@echo "  make doctor       Run preflight checks (tools, inventory, SSH, target facts)"
-	@echo "  make apply        Run full setup (playbooks/site.yml)"
-	@echo "  make workstation  Run workstation setup only"
-	@echo "  make pentest      Run pentest + vpn roles only"
-	@echo "  make validate     Run validation checks"
+	@echo "  make deps           Install Ansible collections from requirements.yml"
+	@echo "  make doctor         Run preflight checks (tools, inventory, SSH, target facts)"
+	@echo "  make apply          Run full setup (playbooks/site.yml)"
+	@echo "  make workstation    Run workstation setup only"
+	@echo "  make pentest        Run pentest + vpn roles only"
+	@echo "  make validate       Run validation checks (all hosts)"
+	@echo "  make fedora         Run site.yml limited to fedora43"
+	@echo "  make kali           Run site.yml limited to kali"
+	@echo "  make validate-kali  Run validate.yml limited to kali"
 	@echo ""
 	@echo "Optional overrides:"
-	@echo "  INVENTORY=<path>  Inventory file (default: $(INVENTORY))"
-	@echo "  EXTRA_ARGS='...'  Extra ansible-playbook flags"
+	@echo "  INVENTORY=<path>    Inventory file (default: $(INVENTORY))"
+	@echo "  EXTRA_ARGS='...'    Extra ansible-playbook flags"
 
 deps:
 	$(ANSIBLE_GALAXY) collection install -r requirements.yml
@@ -35,10 +38,10 @@ doctor:
 	@echo "[3/5] Validating inventory parse..."
 	@ansible-inventory -i $(INVENTORY) --list >/dev/null
 	@echo "[4/5] Checking SSH connectivity via Ansible ping..."
-	@ansible -i $(INVENTORY) fedora43-utm -m ping -o $(EXTRA_ARGS)
+	@ansible -i $(INVENTORY) workstation -m ping -o -e 'ansible_become=false' $(EXTRA_ARGS)
 	@echo "[5/5] Checking target OS and architecture..."
-	@ansible -i $(INVENTORY) fedora43-utm -m setup -a 'filter=ansible_distribution*' -o $(EXTRA_ARGS)
-	@ansible -i $(INVENTORY) fedora43-utm -m setup -a 'filter=ansible_architecture' -o $(EXTRA_ARGS)
+	@ansible -i $(INVENTORY) workstation -m setup -a 'filter=ansible_distribution*' -o -e 'ansible_become=false' $(EXTRA_ARGS)
+	@ansible -i $(INVENTORY) workstation -m setup -a 'filter=ansible_architecture' -o -e 'ansible_become=false' $(EXTRA_ARGS)
 	@echo "Doctor checks passed."
 
 apply:
@@ -52,3 +55,12 @@ pentest:
 
 validate:
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml $(EXTRA_ARGS)
+
+fedora:
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit fedora43 $(EXTRA_ARGS)
+
+kali:
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali $(EXTRA_ARGS)
+
+validate-kali:
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml --limit kali $(EXTRA_ARGS)

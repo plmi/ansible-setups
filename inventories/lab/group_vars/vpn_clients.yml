@@ -1,0 +1,4 @@
+---
+# VPN client configuration
+# openvpn and wireguard-tools are installed via the common_base role
+# This group enables the vpn_lab role which sets up NM integration and config dirs

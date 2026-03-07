@@ -1,0 +1,14 @@
+---
+- name: Ensure GNU Stow is installed
+  ansible.builtin.apt:
+    name: stow
+    state: present
+
+- name: Remove default zsh skeleton files that would conflict with stow
+  ansible.builtin.file:
+    path: "/home/{{ primary_user }}/{{ item }}"
+    state: absent
+  loop:
+    - .zshrc
+    - .zprofile
+  become_user: "{{ primary_user }}"

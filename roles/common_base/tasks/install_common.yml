@@ -1,0 +1,23 @@
+---
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ timezone }}"
+
+- name: Ensure Flathub remote is configured
+  community.general.flatpak_remote:
+    name: flathub
+    state: present
+    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
+  when: obsidian_enable | default(true) | bool
+  tags: [obsidian]
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Install Obsidian via Flatpak
+  community.general.flatpak:
+    name: "{{ obsidian_flatpak_app_id | default('md.obsidian.Obsidian') }}"
+    state: present
+    remote: flathub
+    method: system
+  when: obsidian_enable | default(true) | bool
+  tags: [obsidian]
+  ignore_errors: "{{ ansible_check_mode }}"

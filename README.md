@@ -9,6 +9,7 @@ No click-ops. No mystery state. Just `make apply`.
 - OSCP-oriented tooling with Kali-like paths where it matters
 - Screenshot + annotation flow for report evidence (`grim` + `slurp` + `swappy`)
 - OSCP-focused Waybar with VPN/target/public-IP visibility
+- Dotfiles from `https://github.com/plmi/dotfiles` applied via `make fedora-hyprland`
 
 ## Fast Start
 ```bash
@@ -58,7 +59,7 @@ make apply EXTRA_ARGS='--ask-pass --ask-become-pass'
 ```
 
 ## Playbooks
-- `playbooks/workstation.yml`: base OS + user + shell + Hyprland
+- `playbooks/workstation.yml`: base OS + user + shell + Hyprland packages + dotfiles apply
 - `playbooks/pentest.yml`: pentest tools + VPN tooling
 - `playbooks/site.yml`: full setup (workstation + pentest)
 - `playbooks/validate.yml`: post-install checks
@@ -82,6 +83,7 @@ make apply EXTRA_ARGS='--ask-pass --ask-become-pass'
 - `nikto`: latest release zip to `/opt/nikto/<tag>` + wrapper at `/usr/local/bin/nikto`
 - `sqlmap`: git clone to `/opt/sqlmap/current` + wrapper at `/usr/local/bin/sqlmap`
 - `searchsploit`: git clone to `/opt/exploit-database` + symlink `/usr/local/bin/searchsploit`
+- Dotfiles repo: cloned to `~/dotfiles`, then profile applied with `make fedora-hyprland`
 
 ### Language/Runtime Managers
 - `impacket`: `python3 -m pipx install impacket`
@@ -111,6 +113,8 @@ ansible-playbook -i inventories/lab/hosts.yml playbooks/validate.yml
 - Store secrets with Ansible Vault.
 - Disable Hyprland COPR if needed via `hyprland_enable_copr: false` in `inventories/lab/group_vars/hyprland.yml`.
 - `ansible.cfg` uses `ssh_connection.usetty=False` to avoid OSC 3008 escape-sequence noise in module JSON output.
+- Dotfiles are the source of truth for user/system config (`~/.config/*`, shell, editor, Waybar, Hyprland, and `/etc/sddm.conf.d`, `/etc/sudoers.d/90-michael`).
+- Ansible no longer templates overlapping dotfiles; it installs packages/services and then applies dotfiles.
 
 ## VPN Profile Import (nmcli)
 - The OSCP launcher VPN toggle (`SUPER+R` -> `VPN: toggle connection`) uses NetworkManager profiles from `nmcli`, not raw config files.

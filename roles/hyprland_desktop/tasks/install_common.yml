@@ -1,0 +1,23 @@
+---
+- name: Check if spice-vdagentd service is available
+  ansible.builtin.stat:
+    path: /usr/lib/systemd/system/spice-vdagentd.service
+  register: spice_vdagentd_service
+
+- name: Ensure spice-vdagentd is enabled and running
+  ansible.builtin.systemd:
+    name: spice-vdagentd
+    enabled: true
+    state: started
+  when: spice_vdagentd_service.stat.exists
+
+- name: Ensure OSCP workspace directories exist
+  ansible.builtin.file:
+    path: "/home/{{ primary_user }}/{{ item }}"
+    state: directory
+    owner: "{{ primary_user }}"
+    group: "{{ primary_user }}"
+    mode: "0755"
+  loop:
+    - oscp
+    - oscp/targets

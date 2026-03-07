@@ -1,0 +1,53 @@
+---
+- name: Checkout dotfiles repository
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo_url }}"
+    dest: "{{ dotfiles_repo_dest }}"
+    version: "{{ dotfiles_repo_version }}"
+    update: true
+    force: true
+  become_user: "{{ primary_user }}"
+
+- name: Apply user dotfiles profile
+  ansible.builtin.command:
+    cmd: "make -C {{ dotfiles_repo_dest }} {{ dotfiles_profile }} SYSTEM_PACKAGES_{{ dotfiles_profile }}="
+  become_user: "{{ primary_user }}"
+  environment:
+    HOME: "/home/{{ primary_user }}"
+
+- name: Apply system dotfiles package
+  ansible.builtin.command:
+    cmd: "stow --dir={{ dotfiles_repo_dest }} --target=/etc --restow etc"
+
+- name: Fix hardcoded ~/bin paths in hyprland config
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '/home/\w+/bin/'
+    replace: "/home/{{ primary_user }}/.local/bin/"
+  when: "'hyprland' in group_names"
+
+- name: Fix hardcoded ~/.config paths in hyprland config
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '/home/\w+/\.config/'
+    replace: "/home/{{ primary_user }}/.config/"
+  when: "'hyprland' in group_names"
+
+- name: Set monitor scale in hyprland config
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '^(monitor=.*,)(\d+(?:\.\d+)?)$'
+    replace: '\g<1>{{ hyprland_monitor_scale }}'
+  when:
+    - "'hyprland' in group_names"
+    - hyprland_monitor_scale is defined
+
+- name: Disable spice-vdagent exec-once when not a SPICE VM
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '^(exec-once\s*=\s*.+spice-vdagent.+)$'
+    replace: '# \1'
+  when:
+    - "'hyprland' in group_names"
+    - spice_vdagentd_service is defined
+    - not spice_vdagentd_service.stat.exists

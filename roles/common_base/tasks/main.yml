@@ -1,120 +1,19 @@
 ---
-- name: Update dnf cache
-  ansible.builtin.dnf:
-    update_cache: true
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      paths: ["{{ role_path }}/vars"]
 
-- name: Upgrade all packages
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
+- name: Run OS-specific tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "install_{{ ansible_distribution | lower }}.yml"
+        - "install_{{ ansible_os_family | lower }}.yml"
+      paths: ["{{ role_path }}/tasks"]
 
-- name: Install baseline packages
-  ansible.builtin.dnf:
-    name: "{{ base_packages }}"
-    state: present
-
-- name: Set timezone
-  community.general.timezone:
-    name: "{{ timezone }}"
-
-- name: Ensure firewalld is enabled and started
-  ansible.builtin.systemd:
-    name: firewalld
-    enabled: true
-    state: started
-  when: enable_firewalld | bool
-
-- name: Import Brave Browser RPM signing key
-  ansible.builtin.rpm_key:
-    state: present
-    key: https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-  tags: [brave]
-
-- name: Configure Brave Browser RPM repository
-  ansible.builtin.copy:
-    dest: /etc/yum.repos.d/brave-browser.repo
-    owner: root
-    group: root
-    mode: "0644"
-    content: |
-      [brave-browser]
-      name=Brave Browser
-      enabled=1
-      autorefresh=1
-      baseurl=https://brave-browser-rpm-release.s3.brave.com/$basearch
-      gpgcheck=1
-      gpgkey=https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
-  tags: [brave]
-
-- name: Install Brave Browser
-  ansible.builtin.dnf:
-    name: brave-browser
-    state: present
-    update_cache: true
-  tags: [brave]
-
-- name: Ensure Flathub remote is configured
-  community.general.flatpak_remote:
-    name: flathub
-    state: present
-    flatpakrepo_url: https://flathub.org/repo/flathub.flatpakrepo
-  when: obsidian_enable | default(true) | bool
-  tags: [obsidian]
-
-- name: Install Obsidian via Flatpak
-  community.general.flatpak:
-    name: "{{ obsidian_flatpak_app_id | default('md.obsidian.Obsidian') }}"
-    state: present
-    remote: flathub
-    method: system
-  when: obsidian_enable | default(true) | bool
-  tags: [obsidian]
-
-- name: Ensure SDDM config directory exists
-  ansible.builtin.file:
-    path: /etc/sddm.conf.d
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  when: sddm_autologin_enabled | default(false) | bool
-  tags: [sddm]
-
-- name: Configure SDDM autologin
-  ansible.builtin.template:
-    src: sddm-autologin.conf.j2
-    dest: /etc/sddm.conf.d/00-autologin.conf
-    owner: root
-    group: root
-    mode: "0644"
-  when: sddm_autologin_enabled | default(false) | bool
-  tags: [sddm]
-
-- name: Configure SDDM default user session behavior
-  ansible.builtin.template:
-    src: sddm-users.conf.j2
-    dest: /etc/sddm.conf.d/10-default-session.conf
-    owner: root
-    group: root
-    mode: "0644"
-  when: sddm_autologin_enabled | default(false) | bool
-  tags: [sddm]
-
-- name: Find backup files in SDDM config directory
-  ansible.builtin.find:
-    paths: /etc/sddm.conf.d
-    file_type: file
-    patterns:
-      - "*.bak*"
-      - "*~"
-  register: sddm_backup_conf_files
-  when: sddm_autologin_enabled | default(false) | bool
-  tags: [sddm]
-
-- name: Remove backup files from SDDM config directory
-  ansible.builtin.file:
-    path: "{{ item.path }}"
-    state: absent
-  loop: "{{ sddm_backup_conf_files.files }}"
-  when: sddm_autologin_enabled | default(false) | bool
-  tags: [sddm]
+- name: Run common tasks
+  ansible.builtin.include_tasks: install_common.yml

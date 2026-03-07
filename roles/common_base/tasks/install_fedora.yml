@@ -1,0 +1,50 @@
+---
+- name: Update dnf cache
+  ansible.builtin.dnf:
+    update_cache: true
+
+- name: Upgrade all packages
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Install baseline packages
+  ansible.builtin.dnf:
+    name: "{{ _base_packages }}"
+    state: present
+
+- name: Ensure firewalld is enabled and started
+  ansible.builtin.systemd:
+    name: firewalld
+    enabled: true
+    state: started
+  when: enable_firewalld | bool
+
+- name: Import Brave Browser RPM signing key
+  ansible.builtin.rpm_key:
+    state: present
+    key: https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+  tags: [brave]
+
+- name: Configure Brave Browser RPM repository
+  ansible.builtin.copy:
+    dest: /etc/yum.repos.d/brave-browser.repo
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      [brave-browser]
+      name=Brave Browser
+      enabled=1
+      autorefresh=1
+      baseurl=https://brave-browser-rpm-release.s3.brave.com/$basearch
+      gpgcheck=1
+      gpgkey=https://brave-browser-rpm-release.s3.brave.com/brave-core.asc
+  tags: [brave]
+
+- name: Install Brave Browser
+  ansible.builtin.dnf:
+    name: brave-browser
+    state: present
+    update_cache: true
+  tags: [brave]

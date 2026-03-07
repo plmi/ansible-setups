@@ -1,0 +1,33 @@
+---
+- name: Ensure shell and terminal packages are present
+  ansible.builtin.dnf:
+    name: "{{ _terminal_packages }}"
+    state: present
+
+- name: Install session-kde helper
+  ansible.builtin.copy:
+    dest: /usr/local/bin/session-kde
+    owner: root
+    group: root
+    mode: "0755"
+    content: |
+      #!/usr/bin/env sh
+      set -eu
+      conf=/etc/sddm.conf.d/00-autologin.conf
+      sudo test -f "$conf"
+      sudo sed -i 's/^Session=.*/Session=plasma.desktop/' "$conf"
+      sudo systemctl restart sddm
+
+- name: Install session-hyprland helper
+  ansible.builtin.copy:
+    dest: /usr/local/bin/session-hyprland
+    owner: root
+    group: root
+    mode: "0755"
+    content: |
+      #!/usr/bin/env sh
+      set -eu
+      conf=/etc/sddm.conf.d/00-autologin.conf
+      sudo test -f "$conf"
+      sudo sed -i 's/^Session=.*/Session=hyprland.desktop/' "$conf"
+      sudo systemctl restart sddm

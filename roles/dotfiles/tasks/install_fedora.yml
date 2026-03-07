@@ -1,0 +1,5 @@
+---
+- name: Ensure GNU Stow is installed
+  ansible.builtin.dnf:
+    name: stow
+    state: present

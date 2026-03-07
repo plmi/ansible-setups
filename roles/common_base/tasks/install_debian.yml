@@ -1,0 +1,46 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: dist
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name: "{{ _base_packages }}"
+    state: present
+
+- name: Ensure ufw is enabled
+  community.general.ufw:
+    state: enabled
+  when: enable_firewalld | bool
+  ignore_errors: "{{ ansible_check_mode }}"
+
+- name: Import Brave Browser signing key
+  ansible.builtin.get_url:
+    url: https://brave-keyring.s3.brave.com/brave-browser-archive-keyring.gpg
+    dest: /usr/share/keyrings/brave-browser-archive-keyring.gpg
+    mode: "0644"
+  tags: [brave]
+  when: ansible_architecture == 'x86_64'
+
+- name: Configure Brave Browser APT repository
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/brave-browser.list
+    owner: root
+    group: root
+    mode: "0644"
+    content: "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg arch=amd64] https://brave-browser-apt-release.s3.brave.com/ stable main\n"
+  tags: [brave]
+  when: ansible_architecture == 'x86_64'
+
+- name: Install Brave Browser
+  ansible.builtin.apt:
+    name: brave-browser
+    state: present
+    update_cache: true
+  tags: [brave]
+  when: ansible_architecture == 'x86_64'

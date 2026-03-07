@@ -1,0 +1,17 @@
+---
+- name: Ensure dnf COPR plugin is installed
+  ansible.builtin.dnf:
+    name: dnf-plugins-core
+    state: present
+  when: hyprland_enable_copr | bool
+
+- name: Enable Hyprland COPR repository
+  ansible.builtin.command:
+    cmd: "dnf -y copr enable {{ hyprland_copr_repo }}"
+    creates: "{{ hyprland_copr_repo_file }}"
+  when: hyprland_enable_copr | bool
+
+- name: Install Hyprland stack
+  ansible.builtin.dnf:
+    name: "{{ _hyprland_packages }}"
+    state: present

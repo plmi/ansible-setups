@@ -1,0 +1,22 @@
+---
+_hyprland_packages:
+  - hyprland
+  - hyprpaper
+  - waybar
+  - wofi
+  - sway-notification-center
+  - hyprlock
+  - hypridle
+  - grim
+  - slurp
+  - swappy
+  - xdg-desktop-portal
+  - xdg-desktop-portal-hyprland
+  - lxqt-policykit
+  - network-manager-gnome
+  - pipewire
+  - wireplumber
+  - pavucontrol
+  - brightnessctl
+  - playerctl
+  - fonts-font-awesome

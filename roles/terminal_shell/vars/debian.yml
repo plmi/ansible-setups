@@ -1,0 +1,13 @@
+---
+_terminal_packages:
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+  - foot
+  - tmux
+  - neovim
+  - fzf
+  - bat
+  - btop
+  - fastfetch
+  - zoxide

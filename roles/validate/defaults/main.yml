@@ -1,0 +1,22 @@
+---
+validate_core_binaries:
+  - zsh
+  - tmux
+  - nvim
+  - shellcheck
+
+validate_hyprland_binaries:
+  - hyprland
+  - foot
+  - grim
+  - slurp
+  - swappy
+
+validate_pentest_binaries:
+  - nmap
+  - feroxbuster
+  - nikto
+  - sqlmap
+  - wpscan
+  - searchsploit
+  - burp

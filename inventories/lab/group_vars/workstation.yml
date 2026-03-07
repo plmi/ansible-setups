@@ -1,0 +1,7 @@
+---
+obsidian_enable: true
+obsidian_flatpak_app_id: md.obsidian.Obsidian
+
+dotfiles_repo_url: https://github.com/plmi/dotfiles
+dotfiles_repo_version: master
+dotfiles_repo_dest: "/home/{{ primary_user }}/dotfiles"
