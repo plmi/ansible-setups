@@ -18,3 +18,12 @@
       tags: [hyprland]
     - role: dotfiles
       tags: [dotfiles]
+
+- name: Configure i3 desktop
+  hosts: i3
+  become: true
+  roles:
+    - role: i3_desktop
+      tags: [i3]
+    - role: dotfiles
+      tags: [dotfiles]

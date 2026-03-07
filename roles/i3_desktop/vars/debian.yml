@@ -1,0 +1,14 @@
+---
+_i3_packages:
+  - i3
+  - i3blocks
+  - i3lock
+  - rofi
+  - feh
+  - picom
+  - dunst
+  - xclip
+  - xss-lock
+  - alacritty
+  - arandr
+  - autorandr

@@ -42,6 +42,20 @@
     - "'hyprland' in group_names"
     - hyprland_monitor_scale is defined
 
+- name: Remove deprecated disable_hyprland_qtutils_check option
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '^\s*disable_hyprland_qtutils_check\s*=.*\n?'
+    replace: ''
+  when: "'hyprland' in group_names"
+
+- name: Replace deprecated windowrulev2 with windowrule
+  ansible.builtin.replace:
+    path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"
+    regexp: '^windowrulev2\s*='
+    replace: 'windowrule ='
+  when: "'hyprland' in group_names"
+
 - name: Disable spice-vdagent exec-once when not a SPICE VM
   ansible.builtin.replace:
     path: "{{ dotfiles_repo_dest }}/hypr/.config/hypr/hyprland.conf"

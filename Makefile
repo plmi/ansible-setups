@@ -5,7 +5,7 @@ ANSIBLE_PLAYBOOK ?= ansible-playbook
 ANSIBLE_GALAXY ?= ansible-galaxy
 EXTRA_ARGS ?=
 
-.PHONY: help deps doctor apply workstation pentest validate fedora kali validate-kali
+.PHONY: help deps doctor apply workstation pentest validate fedora kali kali-i3 validate-kali
 
 help:
 	@echo "Targets:"
@@ -17,6 +17,7 @@ help:
 	@echo "  make validate       Run validation checks (all hosts)"
 	@echo "  make fedora         Run site.yml limited to fedora43"
 	@echo "  make kali           Run site.yml limited to kali"
+	@echo "  make kali-i3        Run site.yml limited to kali-i3"
 	@echo "  make validate-kali  Run validate.yml limited to kali"
 	@echo ""
 	@echo "Optional overrides:"
@@ -61,6 +62,9 @@ fedora:
 
 kali:
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali $(EXTRA_ARGS)
+
+kali-i3:
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali-i3 $(EXTRA_ARGS)
 
 validate-kali:
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml --limit kali $(EXTRA_ARGS)

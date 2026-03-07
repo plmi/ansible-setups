@@ -3,3 +3,8 @@
   ansible.builtin.apt:
     name: "{{ _terminal_packages }}"
     state: present
+
+- name: Ensure pyenv build dependencies are present
+  ansible.builtin.apt:
+    name: "{{ _pyenv_build_deps }}"
+    state: present

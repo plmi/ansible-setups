@@ -4,6 +4,11 @@
     name: "{{ _terminal_packages }}"
     state: present
 
+- name: Ensure pyenv build dependencies are present
+  ansible.builtin.dnf:
+    name: "{{ _pyenv_build_deps }}"
+    state: present
+
 - name: Install session-kde helper
   ansible.builtin.copy:
     dest: /usr/local/bin/session-kde

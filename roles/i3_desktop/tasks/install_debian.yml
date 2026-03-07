@@ -1,0 +1,5 @@
+---
+- name: Install i3 desktop stack
+  ansible.builtin.apt:
+    name: "{{ _i3_packages }}"
+    state: present

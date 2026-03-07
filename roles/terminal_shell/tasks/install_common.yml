@@ -92,6 +92,24 @@
         remote_src: true
       when: eza_installed_version != eza_release_version
 
+- name: Install/update pyenv for primary user
+  ansible.builtin.git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: "/home/{{ primary_user }}/.pyenv"
+    version: master
+    depth: 1
+    update: true
+  become_user: "{{ primary_user }}"
+
+- name: Install/update pyenv-virtualenv plugin
+  ansible.builtin.git:
+    repo: https://github.com/pyenv/pyenv-virtualenv.git
+    dest: "/home/{{ primary_user }}/.pyenv/plugins/pyenv-virtualenv"
+    version: master
+    depth: 1
+    update: true
+  become_user: "{{ primary_user }}"
+
 - name: Set default shell for primary user
   ansible.builtin.user:
     name: "{{ primary_user }}"
