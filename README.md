@@ -1,4 +1,4 @@
-# Hyprland OSCP Lab (Ansible)
+# OSCP Lab (Ansible)
 
 Reproducible pentest workstation setup for **Fedora 43** and **Kali Linux**.
 No click-ops. No mystery state. Just `make apply`.
@@ -9,28 +9,40 @@ No click-ops. No mystery state. Just `make apply`.
 |---|---|---|---|---|
 | `fedora43` | Fedora 43 | UTM | `michael` | Hyprland (Wayland) |
 | `kali` | Kali Linux Rolling | Parallels Desktop | `parallels` | Hyprland (Wayland) |
-| `kali-i3` | Kali Linux Rolling | — | `kali` | i3 (X11) |
+| `kali-i3` | Kali Linux Rolling | Parallels Desktop | `michael` | i3 (X11) |
 
 ## What You Get
-- Minimal Hyprland desktop tuned for operator workflow
-- `foot` + `zsh` + `tmux` + `neovim` + `eza`
+
+**All hosts:**
+- `zsh` + `tmux` + `neovim` + `eza` + `pyenv`
 - OSCP-oriented tooling with Kali-like paths where it matters
+- Dotfiles from `https://github.com/plmi/dotfiles`
+- Brave Browser, Obsidian via Flatpak
+
+**Hyprland hosts (`fedora43`, `kali`):**
+- Minimal Hyprland desktop tuned for operator workflow
+- `foot` terminal, `wofi` launcher, `waybar` with VPN/target/public-IP visibility
 - Screenshot + annotation flow (`grim` + `slurp` + `swappy`)
-- Waybar with VPN/target/public-IP visibility
-- Dotfiles from `https://github.com/plmi/dotfiles` applied via `make fedora-hyprland`
-- Obsidian via Flatpak, Brave Browser
+
+**i3 host (`kali-i3`):**
+- i3 window manager (X11) with `i3blocks` status bar
+- `alacritty` terminal, `rofi` launcher, `picom` compositor
+- `feh` wallpaper, `dunst` notifications, `i3lock` screen lock
 
 ## Fast Start
+
 ```bash
 make deps
 make doctor
-make apply        # all hosts
-make fedora       # fedora43 only
-make kali         # kali only
+make apply          # all hosts
+make fedora         # fedora43 only
+make kali           # kali (Hyprland) only
+make kali-i3        # kali-i3 (i3) only
 make validate
 ```
 
 ## Install Ansible (Control Machine)
+
 ### macOS
 ```bash
 brew install ansible
@@ -53,8 +65,9 @@ sudo apt update && sudo apt install -y ansible
 Confirm SSH and set up key auth for each host:
 
 ```bash
-ssh-copy-id michael@192.168.64.6   # fedora43
-ssh-copy-id parallels@10.211.55.28 # kali
+ssh-copy-id michael@192.168.64.6    # fedora43
+ssh-copy-id parallels@10.211.55.28  # kali
+ssh-copy-id michael@10.211.55.30    # kali-i3
 ```
 
 Password auth fallback:
@@ -76,7 +89,8 @@ inventories/lab/
 │   └── vpn_clients.yml     # VPN group (NM integration)
 └── host_vars/
     ├── fedora43.yml        # Fedora-specific overrides
-    └── kali.yml            # Kali-specific overrides (skips pre-installed tools, scale=1)
+    ├── kali.yml            # Kali Hyprland overrides (skips pre-installed tools, scale=1)
+    └── kali-i3.yml         # Kali i3 overrides (skips pre-installed tools)
 ```
 
 ## Playbooks
@@ -84,7 +98,7 @@ inventories/lab/
 | Playbook | What it runs |
 |---|---|
 | `playbooks/site.yml` | Full setup (workstation + pentest) |
-| `playbooks/workstation.yml` | Base OS + user + shell + Hyprland + dotfiles |
+| `playbooks/workstation.yml` | Base OS + user + shell + desktop (Hyprland or i3) + dotfiles |
 | `playbooks/pentest.yml` | Pentest tools + VPN |
 | `playbooks/validate.yml` | Post-install checks |
 
@@ -108,58 +122,72 @@ inventories/lab/
 | Category | Tool | Source | Method |
 |---|---|---|---|
 | Desktop | hyprland | COPR `solopasha/hyprland` | dnf |
-| Desktop | brave-browser | Brave RPM repo | dnf |
+| Desktop | i3 | OS repos | apt |
+| Desktop | i3blocks | OS repos | apt |
+| Desktop | i3lock | OS repos | apt |
+| Desktop | rofi | OS repos | apt |
+| Desktop | alacritty | OS repos | apt |
+| Desktop | picom | OS repos | apt |
+| Desktop | feh | OS repos | apt |
+| Desktop | dunst | OS repos | apt |
+| Desktop | arandr | OS repos | apt |
+| Desktop | autorandr | OS repos | apt |
+| Desktop | brave-browser | Brave RPM/APT repo | dnf / apt |
 | Desktop | obsidian | Flathub | flatpak |
-| Shell | zsh | Fedora repos | dnf |
-| Shell | foot | Fedora repos | dnf |
-| Shell | tmux | Fedora repos | dnf |
-| Shell | neovim | Fedora repos | dnf |
+| Shell | zsh | OS repos | dnf / apt |
+| Shell | foot | OS repos | dnf / apt |
+| Shell | tmux | OS repos | dnf / apt |
+| Shell | neovim | OS repos | dnf / apt |
 | Shell | eza | GitHub `eza-community/eza` latest | binary tarball |
-| Shell | fzf | Fedora repos | dnf |
-| Shell | bat | Fedora repos | dnf |
-| Shell | btop | Fedora repos | dnf |
-| Shell | zoxide | Fedora repos | dnf |
-| Shell | fastfetch | Fedora repos | dnf |
+| Shell | fzf | OS repos | dnf / apt |
+| Shell | bat | OS repos | dnf / apt |
+| Shell | btop | OS repos | dnf / apt |
+| Shell | zoxide | OS repos | dnf / apt |
+| Shell | fastfetch | OS repos | dnf / apt |
 | Shell | pyenv | GitHub `pyenv/pyenv` | git clone → `~/.pyenv` |
 | Shell | pyenv-virtualenv | GitHub `pyenv/pyenv-virtualenv` | git clone → `~/.pyenv/plugins/` |
-| Pentest | nmap | Fedora repos | dnf |
-| Pentest | netcat | Fedora repos | dnf |
-| Pentest | socat | Fedora repos | dnf |
-| Pentest | tcpdump | Fedora repos | dnf |
-| Pentest | wireshark | Fedora repos | dnf |
-| Pentest | ffuf | Fedora repos | dnf |
-| Pentest | gobuster | Fedora repos | dnf |
-| Pentest | hydra | Fedora repos | dnf |
-| Pentest | john | Fedora repos | dnf |
-| Pentest | hashcat | Fedora repos | dnf |
+| Pentest | nmap | OS repos | dnf / apt |
+| Pentest | netcat | OS repos | dnf / apt |
+| Pentest | socat | OS repos | dnf / apt |
+| Pentest | tcpdump | OS repos | dnf / apt |
+| Pentest | wireshark | OS repos | dnf / apt |
+| Pentest | ffuf | OS repos | dnf / apt |
+| Pentest | gobuster | OS repos | dnf / apt |
+| Pentest | hydra | OS repos | dnf / apt |
+| Pentest | john | OS repos | dnf / apt |
+| Pentest | hashcat | OS repos | dnf / apt |
 | Pentest | feroxbuster | GitHub `epi052/feroxbuster` latest | binary zip |
 | Pentest | nikto | GitHub `sullo/nikto` latest | source zip + wrapper |
 | Pentest | sqlmap | GitHub `sqlmapproject/sqlmap` | git clone + wrapper |
 | Pentest | impacket | PyPI | pipx |
-| Pentest | metasploit | Snap Store | snap |
+| Pentest | metasploit | Snap Store / apt | snap (Fedora) / apt (Kali) |
 | Pentest | wpscan | RubyGems | gem |
 | Pentest | searchsploit | GitLab `exploitdb` | git clone + symlink |
 | Wordlists | seclists | GitHub `danielmiessler/SecLists` | zip → `/usr/share/seclists` |
 | Wordlists | rockyou.txt | SecLists / fallback URL | copy → `/usr/share/wordlists/rockyou.txt` |
-| VPN | openvpn | Fedora repos | dnf |
-| VPN | wireguard-tools | Fedora repos | dnf |
+| VPN | openvpn | OS repos | dnf / apt |
+| VPN | wireguard-tools | OS repos | dnf / apt |
 
-> Kali skips most Pentest entries — override via `pentest_install_*: false` in `host_vars/kali.yml`.
+> Kali hosts (`kali`, `kali-i3`) skip most Pentest entries — Kali pre-installs them. Override via `pentest_install_*: false` in the respective `host_vars/` file.
+> i3 Desktop entries apply to `kali-i3` only.
 
 ### Dotfiles
-- Repo cloned to `~/dotfiles`, profile applied with `make fedora-hyprland`
-- On non-Fedora hosts (Kali), post-stow patches fix hardcoded paths and adapt config:
+- Repo cloned to `~/dotfiles`, profile applied via `make <profile>` (e.g. `fedora-hyprland`, `kali-i3`)
+- Hyprland hosts: post-stow patches fix hardcoded paths and adapt config:
   - `/home/<author>/bin/` → `/home/<primary_user>/.local/bin/`
   - `windowrulev2` → `windowrule` (Hyprland 0.41+ syntax)
-  - Monitor scale set from `hyprland_monitor_scale` (default `2`, Kali uses `1`)
+  - Monitor scale set from `hyprland_monitor_scale` (default `2`, `kali` uses `1`)
   - `spice-vdagent` exec-once commented out on non-SPICE VMs
+- i3 host: dotfiles applied as-is, no patches needed
 
 ## Without Make
+
 ```bash
 ansible-galaxy collection install -r requirements.yml
 ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml
 ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit fedora43
 ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit kali
+ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit kali-i3
 ansible-playbook -i inventories/lab/hosts.yml playbooks/validate.yml
 ```
 
@@ -167,54 +195,44 @@ ansible-playbook -i inventories/lab/hosts.yml playbooks/validate.yml
 - Use only on systems/networks you own or are explicitly authorized to test.
 - Store secrets with Ansible Vault.
 - Firewall (`firewalld`/`ufw`) is **disabled by default** (`enable_firewalld: false`). Enable per-host in `host_vars/`.
-- Dotfiles are the source of truth for user/system config (`~/.config/*`, shell, editor, Waybar, Hyprland).
+- Dotfiles are the source of truth for user/system config (`~/.config/*`, shell, editor, WM, status bar).
 - Ansible installs packages/services and applies dotfiles — it does not template overlapping dotfiles.
 - `ansible.cfg` sets `ssh_connection.usetty=False` to avoid OSC 3008 escape-sequence noise.
 
 ## VPN Profile Import (nmcli)
 
-Import each config once, then select it from the OSCP launcher (`SUPER+R`):
+Ansible installs `openvpn`, `wireguard-tools`, and the Network Manager plugins, and creates
+`~/.config/vpn/openvpn/` and `~/.config/vpn/wireguard/` as drop locations for your profiles.
+
+**Import a profile once** — NM manages it from there:
 
 OpenVPN (`.ovpn`):
 ```bash
-nmcli connection import type openvpn file /path/to/lab.ovpn
+nmcli connection import type openvpn file ~/.config/vpn/openvpn/lab.ovpn
 ```
 
 WireGuard (`.conf`):
 ```bash
-nmcli connection import type wireguard file /path/to/lab.conf
+nmcli connection import type wireguard file ~/.config/vpn/wireguard/lab.conf
 ```
 
-Useful commands:
+**Connect / disconnect:**
 ```bash
-nmcli -t -f NAME,TYPE connection show | grep -E ':(vpn|wireguard)$'
 nmcli connection up id "<profile-name>"
 nmcli connection down id "<profile-name>"
 ```
 
-## Hyprland Keybindings
+**List VPN profiles:**
+```bash
+nmcli -t -f NAME,TYPE connection show | grep -E ':(vpn|wireguard)$'
+```
 
-Modifier: `SUPER`
+**Typical OSCP workflow:**
+1. Download your `.ovpn` from the HTB/OSCP portal
+2. Drop it in `~/.config/vpn/openvpn/`
+3. Import once: `nmcli connection import type openvpn file ~/.config/vpn/openvpn/lab.ovpn`
+4. From then on: `nmcli connection up id "lab"`
 
-| Keybind | Action |
-|---|---|
-| `SUPER+RETURN` | Open terminal (`foot`) |
-| `SUPER+P` / `SUPER+D` | App launcher (`wofi`) |
-| `SUPER+R` | OSCP launcher (`wofi-oscp`) |
-| `SUPER+TAB` | Switch to previous workspace |
-| `SUPER+SPACE` | Toggle special workspace (scratchpad) |
-| `SUPER+SHIFT+SPACE` | Move window to special workspace |
-| `SUPER+SHIFT+S` | Region screenshot → `swappy` |
-| `SUPER+SHIFT+W` | Cycle wallpapers |
-| `SUPER+B` | Toggle Waybar |
-| `SUPER+SHIFT+B` | Reload Waybar |
-| `SUPER+Q` | Close window |
-| `SUPER+SHIFT+E` | Exit Hyprland |
-| `SUPER+F` | Toggle fullscreen |
-| `SUPER+V` | Toggle floating |
-| `SUPER+L` | Lock screen (`hyprlock`) |
-| `SUPER+1..9` | Switch workspace |
-| `SUPER+SHIFT+1..9` | Move window to workspace |
-| `SUPER+H/J/K/L` | Move focus left/down/up/right |
-| `SUPER+Left Mouse` | Move window |
-| `SUPER+Right Mouse` | Resize window |
+On Hyprland hosts, Waybar shows your VPN/TUN IP live so you can confirm connectivity at a glance.
+On `kali-i3`, wire up a TUN IP block in your i3blocks config via dotfiles.
+
