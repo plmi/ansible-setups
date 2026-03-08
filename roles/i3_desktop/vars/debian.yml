@@ -1,4 +1,12 @@
 ---
+_sddm_packages:
+  - sddm
+  - libqt6svg6
+  - qt6-qpa-plugins
+  - qml6-module-qtquick-controls
+  - qml6-module-qtmultimedia
+  - qml6-module-qt5compat-graphicaleffects
+
 _i3_packages:
   - i3
   - i3blocks

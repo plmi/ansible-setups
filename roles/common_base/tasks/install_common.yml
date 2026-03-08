@@ -3,6 +3,62 @@
   community.general.timezone:
     name: "{{ timezone }}"
 
+- name: Install FiraCode Nerd Font
+  tags: [fonts]
+  block:
+    - name: Check installed FiraCode Nerd Font version
+      ansible.builtin.stat:
+        path: /usr/local/share/fonts/FiraCode/.version
+      register: _firacode_version_file
+
+    - name: Read installed FiraCode version
+      ansible.builtin.slurp:
+        src: /usr/local/share/fonts/FiraCode/.version
+      register: _firacode_installed_raw
+      when: _firacode_version_file.stat.exists
+
+    - name: Set FiraCode version facts
+      ansible.builtin.set_fact:
+        _firacode_installed: "{{ (_firacode_installed_raw.content | b64decode | trim) if _firacode_version_file.stat.exists else '' }}"
+        _firacode_version: "3.4.0"
+
+    - name: Download FiraCode Nerd Font zip
+      ansible.builtin.get_url:
+        url: https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip
+        dest: /tmp/FiraCode.zip
+        mode: "0644"
+      when: _firacode_installed != _firacode_version
+
+    - name: Ensure FiraCode font directory exists
+      ansible.builtin.file:
+        path: /usr/local/share/fonts/FiraCode
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      when: _firacode_installed != _firacode_version
+
+    - name: Extract FiraCode Nerd Font
+      ansible.builtin.unarchive:
+        src: /tmp/FiraCode.zip
+        dest: /usr/local/share/fonts/FiraCode
+        remote_src: true
+      when: _firacode_installed != _firacode_version
+
+    - name: Write FiraCode version marker
+      ansible.builtin.copy:
+        dest: /usr/local/share/fonts/FiraCode/.version
+        content: "{{ _firacode_version }}\n"
+        owner: root
+        group: root
+        mode: "0644"
+      when: _firacode_installed != _firacode_version
+
+    - name: Refresh font cache
+      ansible.builtin.command: fc-cache -f /usr/local/share/fonts/FiraCode
+      changed_when: true
+      when: _firacode_installed != _firacode_version
+
 - name: Ensure Flathub remote is configured
   community.general.flatpak_remote:
     name: flathub
