@@ -6,7 +6,6 @@ primary_user: michael
 primary_user_shell: /bin/zsh
 enable_passwordless_sudo: true
 
-enable_auto_updates: false
 enable_firewalld: false
 
 _arch_map:

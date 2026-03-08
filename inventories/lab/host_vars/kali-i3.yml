@@ -2,27 +2,6 @@
 ansible_python_interpreter: /usr/bin/python3
 ansible_become: true
 
-primary_user: michael
-primary_user_groups:
-  - sudo
-
 dotfiles_profile: kali-i3
 
 latex_enable: false
-
-# Kali pre-installs most pentest tools — skip reinstalling them
-pentest_install_nmap: false
-pentest_install_metasploit: false
-pentest_install_nikto: false
-pentest_install_sqlmap: false
-pentest_install_searchsploit: false
-pentest_install_john: false
-pentest_install_hashcat: false
-pentest_install_hydra: false
-pentest_install_gobuster: false
-pentest_install_ffuf: false
-pentest_install_wpscan: false
-pentest_install_seclists: false
-pentest_install_rockyou: false
-pentest_install_wireshark: false
-metasploit_install_method: apt

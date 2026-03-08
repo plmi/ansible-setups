@@ -15,10 +15,10 @@ help:
 	@echo "  make workstation    Run workstation setup only"
 	@echo "  make pentest        Run pentest + vpn roles only"
 	@echo "  make validate       Run validation checks (all hosts)"
-	@echo "  make fedora         Run site.yml limited to fedora43"
-	@echo "  make kali           Run site.yml limited to kali"
+	@echo "  make fedora         Run site.yml limited to fedora-hyprland"
+	@echo "  make kali           Run site.yml limited to kali-hyprland"
 	@echo "  make kali-i3        Run site.yml limited to kali-i3"
-	@echo "  make validate-kali  Run validate.yml limited to kali"
+	@echo "  make validate-kali  Run validate.yml limited to kali-hyprland"
 	@echo ""
 	@echo "Optional overrides:"
 	@echo "  INVENTORY=<path>    Inventory file (default: $(INVENTORY))"
@@ -58,13 +58,13 @@ validate:
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml $(EXTRA_ARGS)
 
 fedora:
-	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit fedora43 $(EXTRA_ARGS)
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit fedora-hyprland $(EXTRA_ARGS)
 
 kali:
-	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali $(EXTRA_ARGS)
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali-hyprland $(EXTRA_ARGS)
 
 kali-i3:
 	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/site.yml --limit kali-i3 $(EXTRA_ARGS)
 
 validate-kali:
-	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml --limit kali $(EXTRA_ARGS)
+	$(ANSIBLE_PLAYBOOK) -i $(INVENTORY) playbooks/validate.yml --limit kali-hyprland $(EXTRA_ARGS)

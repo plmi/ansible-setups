@@ -1,0 +1,13 @@
+---
+ansible_python_interpreter: /usr/bin/python3
+ansible_become: true
+
+primary_user: parallels
+
+dotfiles_profile: fedora-hyprland
+
+latex_enable: false
+
+# Parallels handles display scaling at the VM layer — scale 1 avoids the
+# "Invalid scale, failed to find a clean divisor" error on Virtual-1
+hyprland_monitor_scale: 1

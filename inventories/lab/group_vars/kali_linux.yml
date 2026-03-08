@@ -1,20 +1,10 @@
 ---
-ansible_python_interpreter: /usr/bin/python3
-ansible_become: true
-
-primary_user: parallels
+# Kali pre-installs most pentest tools — skip reinstalling them
 primary_user_groups:
   - sudo
 
-dotfiles_profile: fedora-hyprland
+metasploit_install_method: apt
 
-latex_enable: false
-
-# Parallels handles display scaling at the VM layer — scale 1 avoids the
-# "Invalid scale, failed to find a clean divisor" error on Virtual-1
-hyprland_monitor_scale: 1
-
-# Kali pre-installs most pentest tools — skip reinstalling them
 pentest_install_nmap: false
 pentest_install_metasploit: false
 pentest_install_nikto: false
@@ -29,4 +19,3 @@ pentest_install_wpscan: false
 pentest_install_seclists: false
 pentest_install_rockyou: false
 pentest_install_wireshark: false
-metasploit_install_method: apt

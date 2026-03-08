@@ -7,6 +7,16 @@
     append: true
     create_home: true
 
+- name: Configure passwordless sudo for primary user
+  ansible.builtin.copy:
+    dest: "/etc/sudoers.d/90-{{ primary_user }}"
+    content: "{{ primary_user }} ALL=(ALL) NOPASSWD:ALL\n"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+  when: enable_passwordless_sudo | bool
+
 - name: Ensure workspace directories exist
   ansible.builtin.file:
     path: "/home/{{ primary_user }}/{{ item }}"

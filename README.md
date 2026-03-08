@@ -1,25 +1,28 @@
 # OSCP Lab (Ansible)
 
-Reproducible pentest workstation setup for **Fedora 43** and **Kali Linux**.
+Reproducible workstation setup for **Fedora** (Hyprland) and **Kali Linux** (Hyprland + i3).
 No click-ops. No mystery state. Just `make apply`.
 
 ## Supported Hosts
 
 | Host | OS | VM Platform | User | Desktop |
 |---|---|---|---|---|
-| `fedora43` | Fedora 43 | UTM | `michael` | Hyprland (Wayland) |
-| `kali` | Kali Linux Rolling | Parallels Desktop | `parallels` | Hyprland (Wayland) |
+| `fedora-hyprland` | Fedora 43 | UTM | `michael` | Hyprland (Wayland) |
+| `kali-hyprland` | Kali Linux Rolling | Parallels Desktop | `parallels` | Hyprland (Wayland) |
 | `kali-i3` | Kali Linux Rolling | Parallels Desktop | `michael` | i3 (X11) |
 
 ## What You Get
 
 **All hosts:**
 - `zsh` + `tmux` + `neovim` + `eza` + `pyenv`
-- OSCP-oriented tooling with Kali-like paths where it matters
 - Dotfiles from `https://github.com/plmi/dotfiles`
 - Brave Browser, Obsidian via Flatpak
 
-**Hyprland hosts (`fedora43`, `kali`):**
+**Kali hosts (`kali-hyprland`, `kali-i3`) — pentest stack:**
+- Full OSCP-oriented tooling with Kali-like paths (`/usr/share/wordlists/`, `/usr/share/seclists/`)
+- VPN (OpenVPN + WireGuard via NetworkManager)
+
+**Hyprland hosts (`fedora-hyprland`, `kali-hyprland`):**
 - Minimal Hyprland desktop tuned for operator workflow
 - `foot` terminal, `wofi` launcher, `waybar` with VPN/target/public-IP visibility
 - Screenshot + annotation flow (`grim` + `slurp` + `swappy`)
@@ -35,8 +38,8 @@ No click-ops. No mystery state. Just `make apply`.
 make deps
 make doctor
 make apply          # all hosts
-make fedora         # fedora43 only
-make kali           # kali (Hyprland) only
+make fedora         # fedora-hyprland only
+make kali           # kali-hyprland only
 make kali-i3        # kali-i3 (i3) only
 make validate
 ```
@@ -65,8 +68,8 @@ sudo apt update && sudo apt install -y ansible
 Confirm SSH and set up key auth for each host:
 
 ```bash
-ssh-copy-id michael@192.168.64.6    # fedora43
-ssh-copy-id parallels@10.211.55.28  # kali
+ssh-copy-id michael@192.168.64.6    # fedora-hyprland
+ssh-copy-id parallels@10.211.55.28  # kali-hyprland
 ssh-copy-id michael@10.211.55.30    # kali-i3
 ```
 
@@ -85,12 +88,13 @@ inventories/lab/
 │   ├── all.yml             # shared defaults (timezone, primary_user, etc.)
 │   ├── workstation.yml     # dotfiles repo URL, Obsidian toggle
 │   ├── hyprland.yml        # Hyprland/COPR vars, monitor scale
+│   ├── kali_linux.yml      # shared Kali overrides (skips pre-installed tools, apt metasploit)
 │   ├── pentest.yml         # pentest tool flags and URLs
 │   └── vpn_clients.yml     # VPN group (NM integration)
 └── host_vars/
-    ├── fedora43.yml        # Fedora-specific overrides
-    ├── kali.yml            # Kali Hyprland overrides (skips pre-installed tools, scale=1)
-    └── kali-i3.yml         # Kali i3 overrides (skips pre-installed tools)
+    ├── fedora-hyprland.yml # Fedora-specific overrides
+    ├── kali-hyprland.yml   # Kali Hyprland overrides (parallels user, scale=1)
+    └── kali-i3.yml         # Kali i3 overrides
 ```
 
 ## Playbooks
@@ -112,10 +116,10 @@ inventories/lab/
 | `make workstation` | Run workstation stack only |
 | `make pentest` | Run pentest stack only |
 | `make validate` | Run validation checks (all hosts) |
-| `make fedora` | Run `site.yml` limited to `fedora43` |
-| `make kali` | Run `site.yml` limited to `kali` |
+| `make fedora` | Run `site.yml` limited to `fedora-hyprland` |
+| `make kali` | Run `site.yml` limited to `kali-hyprland` |
 | `make kali-i3` | Run `site.yml` limited to `kali-i3` |
-| `make validate-kali` | Run `validate.yml` limited to `kali` |
+| `make validate-kali` | Run `validate.yml` limited to `kali-hyprland` |
 
 ## Optional Roles
 
@@ -186,29 +190,29 @@ make kali-i3 EXTRA_ARGS="--tags latex"
 | Shell | fastfetch | OS repos | dnf / apt |
 | Shell | pyenv | GitHub `pyenv/pyenv` | git clone → `~/.pyenv` |
 | Shell | pyenv-virtualenv | GitHub `pyenv/pyenv-virtualenv` | git clone → `~/.pyenv/plugins/` |
-| Pentest | nmap | OS repos | dnf / apt |
-| Pentest | netcat | OS repos | dnf / apt |
-| Pentest | socat | OS repos | dnf / apt |
-| Pentest | tcpdump | OS repos | dnf / apt |
-| Pentest | wireshark | OS repos | dnf / apt |
-| Pentest | ffuf | OS repos | dnf / apt |
-| Pentest | gobuster | OS repos | dnf / apt |
-| Pentest | hydra | OS repos | dnf / apt |
-| Pentest | john | OS repos | dnf / apt |
-| Pentest | hashcat | OS repos | dnf / apt |
+| Pentest | nmap | OS repos | apt |
+| Pentest | netcat | OS repos | apt |
+| Pentest | socat | OS repos | apt |
+| Pentest | tcpdump | OS repos | apt |
+| Pentest | wireshark | OS repos | apt |
+| Pentest | ffuf | OS repos | apt |
+| Pentest | gobuster | OS repos | apt |
+| Pentest | hydra | OS repos | apt |
+| Pentest | john | OS repos | apt |
+| Pentest | hashcat | OS repos | apt |
 | Pentest | feroxbuster | GitHub `epi052/feroxbuster` latest | binary zip |
 | Pentest | nikto | GitHub `sullo/nikto` latest | source zip + wrapper |
 | Pentest | sqlmap | GitHub `sqlmapproject/sqlmap` | git clone + wrapper |
 | Pentest | impacket | PyPI | pipx |
-| Pentest | metasploit | Snap Store / apt | snap (Fedora) / apt (Kali) |
+| Pentest | metasploit | apt | apt |
 | Pentest | wpscan | RubyGems | gem |
 | Pentest | searchsploit | GitLab `exploitdb` | git clone + symlink |
 | Wordlists | seclists | GitHub `danielmiessler/SecLists` | zip → `/usr/share/seclists` |
 | Wordlists | rockyou.txt | SecLists / fallback URL | copy → `/usr/share/wordlists/rockyou.txt` |
-| VPN | openvpn | OS repos | dnf / apt |
-| VPN | wireguard-tools | OS repos | dnf / apt |
+| VPN | openvpn | OS repos | apt |
+| VPN | wireguard-tools | OS repos | apt |
 
-> Kali hosts (`kali`, `kali-i3`) skip most Pentest entries — Kali pre-installs them. Override via `pentest_install_*: false` in the respective `host_vars/` file.
+> Pentest and VPN entries apply to Kali hosts only (`kali-hyprland`, `kali-i3`). Most installs skip — Kali pre-installs them. Overrides in `group_vars/kali_linux.yml`.
 > i3 Desktop entries apply to `kali-i3` only.
 
 ### Dotfiles
@@ -216,7 +220,7 @@ make kali-i3 EXTRA_ARGS="--tags latex"
 - Hyprland hosts: post-stow patches fix hardcoded paths and adapt config:
   - `/home/<author>/bin/` → `/home/<primary_user>/.local/bin/`
   - `windowrulev2` → `windowrule` (Hyprland 0.41+ syntax)
-  - Monitor scale set from `hyprland_monitor_scale` (default `2`, `kali` uses `1`)
+  - Monitor scale set from `hyprland_monitor_scale` (default `2`, `kali-hyprland` uses `1`)
   - `spice-vdagent` exec-once commented out on non-SPICE VMs
 - i3 host: dotfiles applied as-is, no patches needed
 
@@ -225,8 +229,8 @@ make kali-i3 EXTRA_ARGS="--tags latex"
 ```bash
 ansible-galaxy collection install -r requirements.yml
 ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml
-ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit fedora43
-ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit kali
+ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit fedora-hyprland
+ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit kali-hyprland
 ansible-playbook -i inventories/lab/hosts.yml playbooks/site.yml --limit kali-i3
 ansible-playbook -i inventories/lab/hosts.yml playbooks/validate.yml
 ```
