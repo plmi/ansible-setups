@@ -1,0 +1,17 @@
+---
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      paths: ["{{ role_path }}/vars"]
+  tags: always
+
+- name: Run OS-specific tasks
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - files:
+        - "install_{{ ansible_distribution | lower }}.yml"
+        - "install_{{ ansible_os_family | lower }}.yml"
+      paths: ["{{ role_path }}/tasks"]

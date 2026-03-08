@@ -8,6 +8,8 @@ primary_user_groups:
 
 dotfiles_profile: kali-i3
 
+latex_enable: false
+
 # Kali pre-installs most pentest tools — skip reinstalling them
 pentest_install_nmap: false
 pentest_install_metasploit: false

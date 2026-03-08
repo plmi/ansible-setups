@@ -117,6 +117,46 @@ inventories/lab/
 | `make kali-i3` | Run `site.yml` limited to `kali-i3` |
 | `make validate-kali` | Run `validate.yml` limited to `kali` |
 
+## Optional Roles
+
+### LaTeX
+
+The `latex` role is available but **disabled by default** on all hosts. Enable it per-host in `host_vars/`.
+
+**Enable with recommended subset** (good default — covers documents and Beamer presentations):
+
+```yaml
+# inventories/lab/host_vars/kali-i3.yml
+latex_enable: true
+```
+
+**Enable with full TeX Live distribution** (~5 GB):
+
+```yaml
+latex_enable: true
+latex_full: true
+```
+
+#### What each mode installs
+
+| Mode | Debian/Kali | Fedora |
+|---|---|---|
+| `latex_enable: true` (default) | `texlive-latex-{base,recommended,extra}`, `texlive-{fonts-recommended,fonts-extra,science,xetex,luatex,bibtex-extra}`, `latexmk` | `texlive-scheme-medium`, `latexmk` |
+| `latex_full: true` | `texlive-full`, `latexmk` | `texlive-scheme-full`, `latexmk` |
+
+The recommended subset includes:
+- `pdflatex`, `xelatex`, `lualatex` engines
+- Beamer (presentation framework)
+- BibTeX / BibLaTeX bibliography tools
+- Common science/math packages
+- `latexmk` build tool
+
+Run only the latex role on a specific host:
+
+```bash
+make kali-i3 EXTRA_ARGS="--tags latex"
+```
+
 ## Tool Matrix
 
 | Category | Tool | Source | Method |

@@ -1,0 +1,17 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install LaTeX packages (recommended subset)
+  ansible.builtin.apt:
+    name: "{{ _latex_packages }}"
+    state: present
+  when: not latex_full | bool
+
+- name: Install LaTeX packages (full distribution)
+  ansible.builtin.apt:
+    name: "{{ _latex_packages_full }}"
+    state: present
+  when: latex_full | bool

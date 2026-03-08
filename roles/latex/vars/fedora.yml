@@ -1,0 +1,9 @@
+---
+# texlive-scheme-medium covers documents and Beamer presentations
+_latex_packages:
+  - texlive-scheme-medium
+  - latexmk
+
+_latex_packages_full:
+  - texlive-scheme-full
+  - latexmk

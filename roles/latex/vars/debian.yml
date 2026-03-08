@@ -1,0 +1,18 @@
+---
+# Recommended subset: covers documents, Beamer presentations, XeTeX, LuaTeX, BibTeX
+_latex_packages:
+  - texlive-latex-base
+  - texlive-latex-recommended
+  - texlive-latex-extra        # includes beamer
+  - texlive-fonts-recommended
+  - texlive-fonts-extra
+  - texlive-science
+  - texlive-xetex
+  - texlive-luatex
+  - texlive-bibtex-extra
+  - latexmk
+  - texlive-lang-english
+
+_latex_packages_full:
+  - texlive-full
+  - latexmk

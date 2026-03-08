@@ -1,0 +1,16 @@
+---
+- name: Update dnf cache
+  ansible.builtin.dnf:
+    update_cache: true
+
+- name: Install LaTeX packages (recommended subset)
+  ansible.builtin.dnf:
+    name: "{{ _latex_packages }}"
+    state: present
+  when: not latex_full | bool
+
+- name: Install LaTeX packages (full distribution)
+  ansible.builtin.dnf:
+    name: "{{ _latex_packages_full }}"
+    state: present
+  when: latex_full | bool

@@ -9,6 +9,9 @@
       tags: [user]
     - role: terminal_shell
       tags: [shell]
+    - role: latex
+      tags: [latex]
+      when: latex_enable
 
 - name: Configure Hyprland desktop
   hosts: hyprland

@@ -7,3 +7,5 @@ primary_user_groups:
   - wheel
 
 dotfiles_profile: fedora-hyprland
+
+latex_enable: false

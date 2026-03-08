@@ -1,0 +1,5 @@
+---
+latex_enable: false
+
+# Install the full TeX Live distribution (~5 GB) instead of the recommended subset
+latex_full: false
