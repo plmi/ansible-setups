@@ -33,58 +33,44 @@
     mode: "0644"
   notify: Update font cache
 
-- name: Deploy pixel_sakura background image
-  ansible.builtin.copy:
-    src: sddm/Backgrounds/pixelart-sakura.jpg
-    dest: /usr/share/sddm/themes/sddm-astronaut-theme/Backgrounds/pixelart-sakura.jpg
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Remove old pixel_sakura background
-  ansible.builtin.file:
-    path: /usr/share/sddm/themes/sddm-astronaut-theme/Backgrounds/pixel_sakura.png
-    state: absent
-
 - name: Set pixel_sakura as active theme variant in metadata.desktop
   ansible.builtin.lineinfile:
     path: /usr/share/sddm/themes/sddm-astronaut-theme/metadata.desktop
     regexp: "^ConfigFile="
     line: "ConfigFile=Themes/pixel_sakura.conf"
 
-- name: Patch pixel_sakura.conf to use custom background
-  ansible.builtin.lineinfile:
-    path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
-    regexp: '^Background='
-    line: 'Background="Backgrounds/pixel_sakura_static.png"'
-
-- name: Patch pixel_sakura.conf font size
-  ansible.builtin.lineinfile:
-    path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
-    regexp: '^FontSize='
-    line: 'FontSize="22"'
-
-- name: Patch pixel_sakura.conf font family
+- name: Patch pixel_sakura.conf - font family
   ansible.builtin.lineinfile:
     path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
     regexp: '^Font='
     line: 'Font="Lower Pixel"'
 
-- name: Remove autologin config if present
-  ansible.builtin.file:
-    path: /etc/sddm.conf.d/00-autologin.conf
-    state: absent
+- name: Patch pixel_sakura.conf - font size
+  ansible.builtin.lineinfile:
+    path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
+    regexp: '^FontSize='
+    line: 'FontSize="22"'
 
-- name: Set default session to i3
-  ansible.builtin.copy:
-    dest: /etc/sddm.conf.d/10-default-session.conf
-    content: |
-      [Users]
-      RememberLastSession=true
-      DefaultSession=i3.desktop
-    owner: root
-    group: root
-    mode: "0644"
+- name: Patch pixel_sakura.conf - clock and date colors
+  ansible.builtin.lineinfile:
+    path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
+    regexp: "^{{ item.key }}="
+    line: "{{ item.key }}=\"{{ item.value }}\""
+  loop:
+    - { key: TimeTextColor, value: "#c9848a" }
+    - { key: DateTextColor, value: "#c9848a" }
+
+- name: Patch pixel_sakura.conf - date format
+  ansible.builtin.lineinfile:
+    path: /usr/share/sddm/themes/sddm-astronaut-theme/Themes/pixel_sakura.conf
+    regexp: '^DateFormat='
+    line: 'DateFormat="dddd, MMMM d"'
+
+- name: Patch SessionButton.qml - increase session font size
+  ansible.builtin.replace:
+    path: /usr/share/sddm/themes/sddm-astronaut-theme/Components/SessionButton.qml
+    regexp: 'font\.pointSize: root\.font\.pointSize \* 0\.8'
+    replace: 'font.pointSize: root.font.pointSize * 1.4'
 
 - name: Ensure /etc/sddm.conf.d exists
   ansible.builtin.file:
@@ -98,6 +84,22 @@
   ansible.builtin.template:
     src: sddm/sddm.conf.j2
     dest: /etc/sddm.conf.d/theme.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Remove autologin config if present
+  ansible.builtin.file:
+    path: /etc/sddm.conf.d/00-autologin.conf
+    state: absent
+
+- name: Set default session to i3
+  ansible.builtin.copy:
+    dest: /etc/sddm.conf.d/10-default-session.conf
+    content: |
+      [Users]
+      RememberLastSession=true
+      DefaultSession=i3.desktop
     owner: root
     group: root
     mode: "0644"
